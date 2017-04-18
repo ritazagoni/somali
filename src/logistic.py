@@ -1,5 +1,6 @@
 import pickle, os, numpy as np
 from sklearn import linear_model
+import pandas
 
 def train(features, codes, penalty='l1', C=1):
     """
@@ -51,6 +52,7 @@ def train_on_file(input_name, output_suffix=None, directory='../data', **kwargs)
     if output_suffix:
         with open(os.path.join(directory, '{}_{}.pkl'.format(input_name, output_suffix)), 'wb') as f:
             pickle.dump(classifiers, f)
+    #print(features, codes, classifiers)
     return features, codes, classifiers
 
 
@@ -67,6 +69,7 @@ def predict(classifiers, messages):
         # Get the predictions from each classifier, giving zeros when a classifier is None
         predictions = [c.predict(messages) if c is not None else np.zeros(len(messages)) for c in classifiers]
         # Transpose so that the shape is (n_datapoints, n_classifiers)
+
         return np.array(predictions, dtype='bool').transpose()
     else:
         return classifiers.predict(messages)
@@ -118,19 +121,46 @@ def evaluate(pred, gold, verbose=True):
     recall = n_true_correct / (n_true_correct + n_true_wrong)
     # F1: harmonic mean of precision and recall
     f1 = 2 * precision * recall / (precision + recall)
-    
+
     if verbose:
         # Print results
         print('Accuracy:', accuracy)
         print('Precision:', precision)
         print('Recall:', recall)
         print('F1:', f1)
+
     
-    return accuracy, precision, recall, f1 
+    return accuracy, precision, recall, f1
+
+
+def get_prediction_and_gold_vector(prediction_filename, prediction_codename, gold_filename, gold_codename):
+    gold_pd = pandas.read_csv(gold_filename)
+    gold_pd = gold_pd.drop_duplicates(subset='Message ID')
+    #golds = gold_pd.loc[gold_pd[gold_codename]==1] #no: where out of these ids ml gave 1 - get that subset from gold
+    gold_ids = gold_pd['Message ID']
+    #print('nr of messages verified', len(gold_ids))
+    prediction_pd = pandas.read_csv(prediction_filename)
+    predictions_verified = prediction_pd[prediction_pd['ID'].isin(gold_ids)]
+    print('label: ', gold_codename)
+
+    predictions_to_evaluate = predictions_verified.loc[predictions_verified[prediction_codename]==1]
+    print('labeled messages verified: ', len(predictions_to_evaluate), '\n')
+    predictions_vector = predictions_to_evaluate[prediction_codename]
+    prediction_ids = set(predictions_to_evaluate['ID'])
+    golds = gold_pd[gold_pd['Message ID'].isin(prediction_ids)]
+    golds_vector = golds[gold_codename]
+    return predictions_vector, golds_vector
+
+
 
 
 if __name__ == "__main__":
     'example use:'
-    #features, codes, classifiers = train_on_file('delivery', 'C1', C=1)
+    #features, codes, classifiers = train_on_file('hiv_aids', 'C1', C=1)
     #predictions = predict(classifiers, features)
-    #evaluate(predictions, codes)
+
+    #evaluation: get predicted and blind verified codes
+    predictions, golds = get_prediction_and_gold_vector('../data/hiv_aids_predictions.csv', "('Reason for  Lack of Acceptance', 'HIV/AIDS can spread easily')",
+                                                        '../data/hiv_aids_verification_long.csv', "HIV/AIDS can spread easily")
+    #get evaluation metrics
+    evaluate(predictions, golds)

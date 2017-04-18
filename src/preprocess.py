@@ -33,7 +33,7 @@ def save(feat_bags, code_vecs, code_names, output_file, directory='../data'):
     feat_vecs = vectorise(feat_bags, feat_dict)
     # Find the document frequency of each feature
     feat_freq = (feat_vecs != 0).sum(0)
-    
+
     # Save the features and codes to file,
     # as a list of names and frequencies
     
@@ -89,7 +89,7 @@ def preprocess_long(input_file, output_file, extractor, directory='../data', tex
     # Save the information
     save(feat_bags, code_vecs, code_names, output_file, directory)
 
-def preprocess_pairs(input_file, output_file, extractor, directory='../data', text_col=0, ignore_cols=(), uncoded=('', 'NM')):
+def preprocess_pairs(input_file, output_file, extractor, directory='../data', text_col=2, ignore_cols=(), uncoded=('', '')):
     """
     Preprocess a csv file to feature vectors and binary codes,
     where the input data has groups of codes,
@@ -120,8 +120,10 @@ def preprocess_pairs(input_file, output_file, extractor, directory='../data', te
         code_cols = sorted(set(range(len(headings))) - {text_col} - set(ignore_cols))
         # Group columns in pairs
         pair_indices = list(zip(code_cols[::2], code_cols[1::2]))
-        pair_names = [headings[i][:-1].strip() for i in code_cols[::2]]
-        
+        pair_indices = [(4,5,6), (7,8,9)] # HIV/AIDS triples
+        pair_names = [headings[i][:-1].strip() for i in code_cols[::3]]
+        print('names: ', pair_names)
+
         # Find features and codes
         for row in reader:
             # Find words in message
@@ -152,6 +154,7 @@ def preprocess_pairs(input_file, output_file, extractor, directory='../data', te
         return vec
     
     code_vecs = np.array([vectorise_codes(x) for x in code_sets])
+
     
     # Save the information
     save(feat_bags, code_vecs, code_list, output_file, directory)
@@ -159,7 +162,8 @@ def preprocess_pairs(input_file, output_file, extractor, directory='../data', te
 
 if __name__ == "__main__":
     from features import bag_of_words
-    #preprocess_pairs('malaria_original', 'malaria', bag_of_words, ignore_cols=[1,6])
-    #preprocess_pairs('wash_original', 'wash', bag_of_words, ignore_cols=[1,2,13,14])
-    #preprocess_long('nutrition_original', 'nutrition', bag_of_words, ignore_cols=[1,13,14], convert=bool)
-    #preprocess_long('ANC_Delivery Training Set.xlsx - Short', 'delivery', bag_of_words, convert=int)
+    #preprocess_long('Malaria_long', 'malaria', bag_of_words, ignore_cols=[1,12], convert=bool)
+    #preprocess_long('wash_original_long_corr', 'wash', bag_of_words, ignore_cols=[1,2,3,4,5,6,7], convert=bool)
+    #preprocess_long('nutrition_original', 'nutrition', bag_of_words, ignore_cols=[1,2,14,15], convert=bool)
+    #preprocess_long('ANC', 'delivery', bag_of_words, ignore_cols=[1], convert=int)
+    preprocess_pairs('HIV_AIDS coding - Training data (NEW - 13.02.17)_final', 'hiv_aids', bag_of_words, ignore_cols=[0,1,3,10,11,12])
