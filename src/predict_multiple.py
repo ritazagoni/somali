@@ -1,5 +1,5 @@
 import csv, pickle, numpy as np
-from collections import Counter
+#from collections import Counter
 
 from logistic import evaluate, predict
 from features import bag_of_words, vectorise, apply_to_parts
@@ -7,8 +7,11 @@ from features import bag_of_words, vectorise, apply_to_parts
 #name, weeks, code_columns = 'wash', '12', range(8, 25)
 #name, weeks, code_columns = 'delivery', '34', range(2, 19)
 #name, weeks, code_columns = 'nutrition', '5', range(3, 13)
-#name, weeks, code_columns = 'malaria', '67', range(2, 12)
-name, weeks, code_columns = 'hiv_aids', '8', range(3, 18)
+name, weeks, code_columns = 'malaria', '67', range(3, 14)
+#name, weeks, code_columns = 'hiv_aids', '8', range(3, 18)
+
+
+
 
 
 # Get the unlabelled data, excluding training set
@@ -16,8 +19,9 @@ name, weeks, code_columns = 'hiv_aids', '8', range(3, 18)
 msgs = []
 training = []
 
-with open('../data/mediaink_s03_9weeks_2002.xls', newline='') as f, open('../data/HIV_AIDS coding - Training data (NEW - 13.02.17)_final.csv', newline='') as trainingf:
-    reader = list(csv.reader(f, delimiter='\t'))
+
+with open('../data/malaria_full.csv', newline='') as f, open('../data/malaria_training_long_0905.csv', newline='') as trainingf:
+    reader = list(csv.reader(f)) #, delimiter='\t'))
     training_reader = list(csv.reader(trainingf))
     mids = [row[0] for row in training_reader]
     headings = reader[0]
@@ -34,7 +38,7 @@ with open('../data/{}_features.pkl'.format(name), 'rb') as f:
 feat_list = [x for x,_ in feats]
 feat_dict = {x:i for i,x in enumerate(feat_list)}
 
-featurise = apply_to_parts(bag_of_words, '&&&')
+featurise = apply_to_parts(bag_of_words, '<$$$>')
 feat_vecs = vectorise([featurise(x[5]) for x in msgs], feat_dict)
 # Load the classifiers and codes
 
@@ -46,12 +50,14 @@ with open('../data/{}_codes.pkl'.format(name), 'rb') as f:
 code_names = [x for x,_ in codes]
 print(code_names)
 headings.extend(code_names)
+headings.extend(['source'])
 
 # Make predictions
 
 predictions = predict(classifiers, feat_vecs)
 for i, m in enumerate(msgs):
     m.extend([1 if x else '' for x in predictions[i]])
+    m.extend(['prediction'])
 
 """
 def add_training_messages_pairs():
@@ -70,24 +76,28 @@ def add_training_messages_pairs():
         code_sets.append(row_code_set)
 
 """
-"""
+
+seen_messages = set()
 training_messages = []
+
 def add_training_messages(code_columns):
-    for row in reader:
-        if row[4] in weeks and row[0] in mids:
+    for row in reader[1:]:
+        if row[0] in mids:
             for trow in training_reader:
                 if row[0] == trow[0]:
+                    if row[0] in seen_messages:
+                        continue
+                    seen_messages.add(row[0])
                     row.extend([trow[c] for c in code_columns])
                     row.extend(['training'])
                     training_messages.append(row)
 
 add_training_messages(code_columns)
-"""
 
 # Save the data with the predictions
 
-with open('../data/{}_predictions_2002_final.csv'.format(name), 'w', newline='') as f:
+with open('../data/{}_predictions_0905.csv'.format(name), 'w', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(headings)
     writer.writerows(msgs)
-    #writer.writerows(training_messages)
+    writer.writerows(training_messages)
