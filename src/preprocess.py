@@ -331,11 +331,6 @@ def extract_features_and_idf(input_files, output_file, extractor, threshold=None
 
 if __name__ == "__main__":
     from features import bag_of_words
-    #preprocess_long('malaria_training_long_new', 'malaria', bag_of_words, ignore_cols=[0,1,12], convert=bool)
-    #preprocess_long('wash_original_long_corr', 'wash', bag_of_words, ignore_cols=[1,2,3,4,5,6,7], convert=bool)
-    #preprocess_long('nutrition_original', 'nutrition', bag_of_words, ignore_cols=[1,2,14,15], convert=bool)
-    #preprocess_long('ANC', 'delivery', bag_of_words, ignore_cols=[1], convert=int)
-    #preprocess_pairs('HIV_AIDS coding - Training data (NEW - 13.02.17)_final', 'hiv_aids', bag_of_words, ignore_cols=[0,1,3,10,11,12])
 
     ### Extract both single words and bigrams
 
@@ -351,7 +346,7 @@ if __name__ == "__main__":
     '''
     ### Preprocess individual files with an extractor
 
-    #preprocess_long('malaria_training_long_0905', 'malaria', feature_extractor, ignore_cols=[0,1], text_col=2)
+    preprocess_long('malaria_training_long', 'malaria', feature_extractor, ignore_cols=[0,1], text_col=2)
 
 
     #preprocess_pairs('wash_original', 'wash', feature_extractor, ignore_cols=[1,2,13,14])
@@ -370,7 +365,7 @@ if __name__ == "__main__":
     '''
     ### Preprocess keywords
 
-    preprocess_keywords('malaria_keywords', 'malaria_features')
+    #preprocess_keywords('malaria_keywords', 'malaria_features')
 
     '''
     preprocess_keywords('wash_keywords', 'wash_features')

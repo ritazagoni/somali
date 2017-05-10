@@ -4,7 +4,7 @@ import csv, pickle, numpy as np
 from logistic import evaluate, predict
 from features import bag_of_words, vectorise, apply_to_parts
 
-#name, weeks, code_columns = 'wash', '12', range(8, 25)
+#name, weeks, code_columns = 'wash', '12', range(3, 17)
 #name, weeks, code_columns = 'delivery', '34', range(2, 19)
 #name, weeks, code_columns = 'nutrition', '5', range(3, 13)
 name, weeks, code_columns = 'malaria', '67', range(3, 14)
@@ -59,23 +59,6 @@ for i, m in enumerate(msgs):
     m.extend([1 if x else '' for x in predictions[i]])
     m.extend(['prediction'])
 
-"""
-def add_training_messages_pairs():
-    pair_indices = [(4, 5, 6), (7, 8, 9)]  # HIV/AIDS triples
-    pair_names = [headings[i][:-1].strip() for i in code_cols[::3]]
-    print('names: ', pair_names)
-
-    # Find features and codes
-    for row in reader:
-        # Find codes
-        row_code_set = set()
-        for name, inds in zip(pair_names, pair_indices):
-            # The code is recorded as a tuple (pair_name, value)
-            # If a code is repeated, it is only counted once
-            row_code_set |= {(name, row[i]) for i in inds if row[i] not in uncoded}
-        code_sets.append(row_code_set)
-
-"""
 
 seen_messages = set()
 training_messages = []
@@ -96,7 +79,7 @@ add_training_messages(code_columns)
 
 # Save the data with the predictions
 
-with open('../data/{}_predictions_0905.csv'.format(name), 'w', newline='') as f:
+with open('../data/{}_predictions.csv'.format(name), 'w', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(headings)
     writer.writerows(msgs)
