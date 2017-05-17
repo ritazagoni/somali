@@ -26,17 +26,17 @@ def evaluate(pred, gold, code, filename, verbose=True):
 
 
 def get_prediction_and_gold_vector(prediction_filename, prediction_codename, gold_filename, gold_codename):
-    gold_pd = pandas.read_csv(gold_filename)
-    gold_pd.fillna(value=0, inplace=True)
-    gold_pd = gold_pd.drop_duplicates(subset='ID')
+    gold_df = pandas.read_csv(gold_filename)
+    gold_df.fillna(value=0, inplace=True)
+    gold_df = gold_df.drop_duplicates(subset='ID')
 
-    print(len(gold_pd))
-    gold_ids = gold_pd['ID']
-    prediction_pd = pandas.read_csv(prediction_filename)
-    prediction_pd.fillna(value=0, inplace=True)
-    prediction_pd = prediction_pd.drop_duplicates(subset='ID')
-    predictions_verified = prediction_pd[
-        (prediction_pd['ID'].isin(gold_ids)) & (prediction_pd['source'] == 'prediction')]
+    print(len(gold_df))
+    gold_ids = gold_df['ID']
+    prediction_df = pandas.read_csv(prediction_filename)
+    prediction_df.fillna(value=0, inplace=True)
+    prediction_df = prediction_df.drop_duplicates(subset='ID')
+    predictions_verified = prediction_df[
+        (prediction_df['ID'].isin(gold_ids)) & (prediction_df['source'] == 'prediction')]
 
     # print('labeled messages verified: ', len(labeled_predictions), '\n')
     print('labeled messages verified: ', len(predictions_verified), '\n')
@@ -44,7 +44,7 @@ def get_prediction_and_gold_vector(prediction_filename, prediction_codename, gol
     # if training data was included in verification, exclude
     pred_ids = predictions_verified['ID']
 
-    verified_to_check = gold_pd[gold_pd['ID'].isin(pred_ids)]
+    verified_to_check = gold_df[gold_df['ID'].isin(pred_ids)]
 
     # align dataframes
     predictions_verified.sort_values(by='ID', inplace=True)
@@ -77,9 +77,9 @@ if __name__ == "__main__":
             code = parts[0]
 
 
-            predictions, golds = get_prediction_and_gold_vector('../data/malaria_predictions_0905.csv',
+            predictions, golds = get_prediction_and_gold_vector('../data/wash_predictions_1505.csv',
                                                                 code,
                                                                 '../data/malaria_verified_long.csv',
                                                                 code)
             # get evaluation metrics
-            evaluate(predictions, golds, code ,'malaria_evaluation')
+            evaluate(predictions, golds, code ,'malaria_evaluation_1205')

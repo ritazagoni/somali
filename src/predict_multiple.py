@@ -1,13 +1,13 @@
 import csv, pickle, numpy as np
 #from collections import Counter
 
-from logistic import evaluate, predict
+from logistic import predict
 from features import bag_of_words, vectorise, apply_to_parts
 
-#name, weeks, code_columns = 'wash', '12', range(3, 17)
+name, weeks, code_columns = 'wash', '12', range(3, 17)
 #name, weeks, code_columns = 'delivery', '34', range(2, 19)
 #name, weeks, code_columns = 'nutrition', '5', range(3, 13)
-name, weeks, code_columns = 'malaria', '67', range(3, 14)
+#name, weeks, code_columns = 'malaria', '67', range(3, 14)
 #name, weeks, code_columns = 'hiv_aids', '8', range(3, 18)
 
 
@@ -20,7 +20,8 @@ msgs = []
 training = []
 
 
-with open('../data/malaria_full.csv', newline='') as f, open('../data/malaria_training_long_0905.csv', newline='') as trainingf:
+with open('../data/messages_beliefs_s02_full_1804.csv', newline='') as f, open('../data/wash_training_long_1005.csv', newline='') as trainingf:
+#with open('../data/malaria_full.csv', newline='') as f, open('../data/malaria_training_long_1105.csv', newline='') as trainingf:
     reader = list(csv.reader(f)) #, delimiter='\t'))
     training_reader = list(csv.reader(trainingf))
     mids = [row[0] for row in training_reader]
@@ -38,8 +39,9 @@ with open('../data/{}_features.pkl'.format(name), 'rb') as f:
 feat_list = [x for x,_ in feats]
 feat_dict = {x:i for i,x in enumerate(feat_list)}
 
-featurise = apply_to_parts(bag_of_words, '<$$$>')
+featurise = apply_to_parts(bag_of_words, '&&&')
 feat_vecs = vectorise([featurise(x[5]) for x in msgs], feat_dict)
+
 # Load the classifiers and codes
 
 with open('../data/{}_C1.pkl'.format(name), 'rb') as f:
@@ -77,9 +79,22 @@ def add_training_messages(code_columns):
 
 add_training_messages(code_columns)
 
+# Print overall counts for each code
+
+all_messages = msgs + training_messages
+
+#print([sum(message[column] for message in all_messages for column in code_columns)])
+
+
+for i, column in enumerate(code_columns):
+    print(column)
+    print(code_names[i])
+
+    print(code_names[i] + ': ' + str(sum(message[column] for message in all_messages)))
+
 # Save the data with the predictions
 
-with open('../data/{}_predictions.csv'.format(name), 'w', newline='') as f:
+with open('../data/{}_predictions_1505.csv'.format(name), 'w', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(headings)
     writer.writerows(msgs)

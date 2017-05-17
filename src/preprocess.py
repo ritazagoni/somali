@@ -258,7 +258,7 @@ def preprocess_keywords(keyword_file, feature_file, output_file=None, directory=
                     elif len(k) == 2:
                         indices.append(feat_dict['ngram', tuple(k)])
                     else:
-                        print(k)
+                        print(line, k)
                         raise ValueError('Keywords must be one or two words long')
 
                 except KeyError:
@@ -322,11 +322,11 @@ def extract_features_and_idf(input_files, output_file, extractor, threshold=None
         idf[feat_dict[feat]] = 1/n
     # Create and save Vectoriser
     vectoriser = Vectoriser(extractor, feat_dict, idf)
-    with open(os.path.join(directory, output_file+'1.pkl'), 'wb') as f:
+    with open(os.path.join(directory, output_file+'.pkl'), 'wb') as f:
         pickle.dump(vectoriser, f)
     # Save list of features
     feat_freq = [(feat, freq[feat]) for feat in feat_list]
-    save_pkl_txt(feat_freq, output_file+'_features1', directory)
+    save_pkl_txt(feat_freq, output_file+'_features', directory)
 
 
 if __name__ == "__main__":
@@ -334,10 +334,14 @@ if __name__ == "__main__":
 
     ### Extract both single words and bigrams
 
-    from features import bag_of_words, bag_of_ngrams, bag_of_variable_character_ngrams, combine
-    functions = [bag_of_words, bag_of_ngrams]
+    from features import bag_of_words, bag_of_ngrams, bag_of_variable_character_ngrams, apply_to_parts, combine
+
+    bag_of_words_parts = apply_to_parts(bag_of_words, '&&&')
+    bag_of_ngrams_parts = apply_to_parts(bag_of_ngrams, '&&&')
+    functions = [bag_of_words_parts, bag_of_ngrams_parts]
     kwargs = [{}, {'n': 2}]
-    feature_extractor = combine(functions, kwarg_params=kwargs)
+    #feature_extractor = combine(functions, kwarg_params=kwargs)
+    feature_extractor  = bag_of_words_parts
 
     ### Define feature vectors based on a whole corpus
     '''
@@ -346,7 +350,9 @@ if __name__ == "__main__":
     '''
     ### Preprocess individual files with an extractor
 
-    preprocess_long('malaria_training_long', 'malaria', feature_extractor, ignore_cols=[0,1], text_col=2)
+    #preprocess_long('malaria_training_long_1105', 'malaria', feature_extractor, ignore_cols=[0,1], text_col=2)
+    #preprocess_long('wash_training_long_1005', 'wash', feature_extractor, ignore_cols=[0, 1], text_col=2)
+    preprocess_long('wash_training_long_1005', 'wash', feature_extractor, ignore_cols=[0, 1], text_col=2)
 
 
     #preprocess_pairs('wash_original', 'wash', feature_extractor, ignore_cols=[1,2,13,14])
@@ -367,8 +373,10 @@ if __name__ == "__main__":
 
     #preprocess_keywords('malaria_keywords', 'malaria_features')
 
+
+    #preprocess_keywords('wash_keywords', 'wash_features')
+
     '''
-    preprocess_keywords('wash_keywords', 'wash_features')
     preprocess_keywords('nutrition_keywords', 'nutrition_features')
     preprocess_keywords('delivery_keywords', 'delivery_features')
     '''

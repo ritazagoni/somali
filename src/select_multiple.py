@@ -31,7 +31,7 @@ with open('../data/{}_features.pkl'.format(name), 'rb') as f:
 feat_list = [x for x,_ in feats]
 feat_dict = {x:i for i,x in enumerate(feat_list)}
 
-featurise = apply_to_parts(bag_of_words, '<$$$>')
+featurise = apply_to_parts(bag_of_words, '&&&')
 feat_vecs = vectorise([featurise(x[4]) for x in msgs], feat_dict)
 
 # Load the classifiers and codes

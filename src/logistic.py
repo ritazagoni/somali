@@ -151,6 +151,6 @@ def predict_prob(classifiers, messages):
 
 if __name__ == "__main__":
     'example use:'
-    features, codes, classifiers = train_on_file('malaria', 'C1', C=1)
+    features, codes, classifiers = train_on_file('wash', 'C1', C=1)
     predictions = predict(classifiers, features)
 
