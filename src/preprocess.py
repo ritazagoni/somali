@@ -401,11 +401,12 @@ if __name__ == "__main__":
 
     bag_of_words_parts = apply_to_parts(bag_of_words, '&&&')
     bag_of_ngrams_parts = apply_to_parts(bag_of_ngrams, '&&&')
-    functions = [bag_of_words_parts, bag_of_ngrams_parts]
-    kwargs = [{}, {'n': 2}]
-    # feature_extractor = combine(functions, kwarg_params=kwargs)
-    feature_extractor  = bag_of_words_parts
 
+    #functions = [bag_of_words_parts, bag_of_ngrams_parts]
+    functions = [bag_of_words, bag_of_ngrams]
+    kwargs = [{}, {'n': 2}]
+    #feature_extractor = bag_of_words_parts
+    feature_extractor = combine(functions, kwarg_params=kwargs)
 
     # both_funcions('wash')
     ### Define feature vectors based on a whole corpus
