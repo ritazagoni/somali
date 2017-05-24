@@ -2,21 +2,25 @@ import numpy as np
 
 from logistic import predict_prob
 
+
 def entropy(p):
     """
     Calculate the entropy of probabilities of binary outcomes
     (the closer the probability is to 1/2, the higher the entropy)
+
     :param p: numpy array of probabilities
     :return: numpy array of entropies
     """
-    q = 1-p
+    q = 1 - p
     return p * np.log(p) + q * np.log(q)
+
 
 def score_by_uncertainty(data, classifiers):
     """
     Score datapoints by how uncertain a classifier is
     :param data: array of vectors
-    :param classifiers: one or more probabilistic classifiers for a binary decisions
+    :param classifiers: one or more probabilistic classifiers for a binary
+    decisions
     :return: entropy of each datapoint
     """
     # Get the classifier's prediction probabilities
@@ -36,13 +40,16 @@ def score_by_uncertainty(data, classifiers):
 # If the overfitting model makes a confident prediction, while the underfitting model does not,
 # this suggests that this data point uses features that we are marginally sure about.
 
+
 def score_by_relative_uncertainty(data, over, under):
     """
     Score datapoints by the difference in uncertainty between two classifiers
+
     :param data: array of vectors
     :param over: one or more probabilistic classifiers for a binary decisions
     :param under: one or more probabilistic classifiers for a binary decisions
-    :return: "under" entropy minus "over" entropy 
+
+    :return: "under" entropy minus "over" entropy
     """
     # Get the classifiers' prediction probabilities
     over_prob = predict_prob(over, data)
@@ -55,6 +62,7 @@ def score_by_relative_uncertainty(data, over, under):
 # Below, we use reweighted range voting - http://rangevoting.org/RRV.html
 # This is so that we choose some examples from each classifier
 
+
 def top_N(scores, N=None, weights=None, R=2, normalise=False):
     """
     Find the most highly scored datapoints
@@ -64,7 +72,7 @@ def top_N(scores, N=None, weights=None, R=2, normalise=False):
     how much weight to place on each column of scores (default equal weight)
     :param R: factor to use in reweighting
     R=1 corresponds to Jefferson/D'Hondt
-    R=2 (default) corresponds to Webster/Sainte-Laguë 
+    R=2 (default) corresponds to Webster/Sainte-Laguë
     :param normalise: whether to normalise each column of scores (default no)
     :return: indices of the top N datapoints, sorted from highest to lowest
     """
@@ -73,10 +81,10 @@ def top_N(scores, N=None, weights=None, R=2, normalise=False):
         N = len(scores)
     # If there is just one set of scores, return the highest
     if scores.ndim == 1:
-        return scores.argsort()[:-N-1:-1]
-    
+        return scores.argsort()[:-N - 1:-1]
+
     # Apply reweighted range voting
-    
+
     # If weights are not given, weight classifiers evenly
     if weights is None:
         weights = np.ones(scores.shape[1])
@@ -91,13 +99,14 @@ def top_N(scores, N=None, weights=None, R=2, normalise=False):
     # Iteratively find the highest scoring datapoint
     for _ in range(N):
         # Reweight, then find the range voting winner
-        # Downweight each classifier, according to the sum of its scores for the datapoints already chosen
+        # Downweight each classifier, according to the sum of its scores for
+        # the datapoints already chosen
         cur_weights = weights / (1 + R * scores[top].sum(0))
         # Find the total reweighted score
         weighted_scores = (scores * cur_weights).sum(1)
         # Ignore datapoints that have already been chosen
         weighted_scores[top] = 0
-        # Record the highest 
+        # Record the highest
         top.append(weighted_scores.argmax())
-    
+
     return np.array(top)
