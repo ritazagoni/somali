@@ -352,7 +352,7 @@ if __name__ == "__main__":
 
     #preprocess_long('malaria_training_long_1105', 'malaria', feature_extractor, ignore_cols=[0,1], text_col=2)
     #preprocess_long('wash_training_long_1005', 'wash', feature_extractor, ignore_cols=[0, 1], text_col=2)
-    preprocess_long('wash_training_long_1005', 'wash', feature_extractor, ignore_cols=[0, 1], text_col=2)
+    preprocess_long('wash_s04_training_long_1705', 'wash_s04', feature_extractor, ignore_cols=[0, 1], text_col=2)
 
 
     #preprocess_pairs('wash_original', 'wash', feature_extractor, ignore_cols=[1,2,13,14])

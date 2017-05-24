@@ -4,14 +4,12 @@ import csv, pickle, numpy as np
 from logistic import predict
 from features import bag_of_words, vectorise, apply_to_parts
 
-name, weeks, code_columns = 'wash', '12', range(3, 17)
+#name, weeks, code_columns = 'wash', '12', range(3, 17)
 #name, weeks, code_columns = 'delivery', '34', range(2, 19)
 #name, weeks, code_columns = 'nutrition', '5', range(3, 13)
 #name, weeks, code_columns = 'malaria', '67', range(3, 14)
 #name, weeks, code_columns = 'hiv_aids', '8', range(3, 18)
-
-
-
+name, weeks, code_columns = 'wash_s04', '3', range(3, 17)
 
 
 # Get the unlabelled data, excluding training set
@@ -19,9 +17,10 @@ name, weeks, code_columns = 'wash', '12', range(3, 17)
 msgs = []
 training = []
 
-
-with open('../data/messages_beliefs_s02_full_1804.csv', newline='') as f, open('../data/wash_training_long_1005.csv', newline='') as trainingf:
+#with open('../data/messages_beliefs_s02_full_1804.csv', newline='') as f, open('../data/wash_training_long_1005.csv', newline='') as trainingf:
+with open('../data/mediaink_s04_1804_yesnos.csv', newline='') as f, open('../data/wash_s04_training_long_1705.csv', newline='') as trainingf:
 #with open('../data/malaria_full.csv', newline='') as f, open('../data/malaria_training_long_1105.csv', newline='') as trainingf:
+
     reader = list(csv.reader(f)) #, delimiter='\t'))
     training_reader = list(csv.reader(trainingf))
     mids = [row[0] for row in training_reader]
@@ -90,11 +89,11 @@ for i, column in enumerate(code_columns):
     print(column)
     print(code_names[i])
 
-    print(code_names[i] + ': ' + str(sum(message[column] for message in all_messages)))
+    #print(code_names[i] + ': ' + str(sum(message[column] for message in all_messages)))
 
 # Save the data with the predictions
 
-with open('../data/{}_predictions_1505.csv'.format(name), 'w', newline='') as f:
+with open('../data/{}_predictions_s02_1805.csv'.format(name), 'w', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(headings)
     writer.writerows(msgs)

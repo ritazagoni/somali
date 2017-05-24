@@ -4,16 +4,16 @@ from collections import Counter
 from features import bag_of_words, vectorise, apply_to_parts
 from active import score_by_uncertainty, top_N
 
-#name, weeks = 'wash', '12'
+name, weeks = 'wash', '12'
 #name, weeks = 'delivery', '34'
 #name, weeks = 'nutrition', '5'
-name, weeks = 'malaria', '67'
+#name, weeks = 'malaria', '67'
 
 
 # Get the unlabelled data
 
 msgs = []
-with open('../data/malaria_full.csv', newline='') as f, open('../data/malaria_training_long_0905.csv', newline='') as trainingf:
+with open('../data/mediaink_s04_1804_yesnos.csv', newline='') as f, open('../data/wash_s04_training_long_1705.csv', newline='') as trainingf:
     reader = list(csv.reader(f))
     headings = reader[0]
 
@@ -51,7 +51,7 @@ top = top_N(scores, 10000)
 
 # Save the data with the predictions
 
-with open('../data/{}_top10000.csv'.format(name), 'w', newline='') as f:
+with open('../data/{}_s04_top10000.csv'.format(name), 'w', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(headings)
     writer.writerows([msgs[i] for i in top])
